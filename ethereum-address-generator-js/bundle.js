@@ -1,44 +1,46 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-// add imports here
-const BIP39 = require("bip39")
+// Add imports here
+const BIP39 = require("bip39");
+const hdkey = require('ethereumjs-wallet/hdkey');
+const Wallet = require('ethereumjs-wallet');
 const keccak256 = require('js-sha3').keccak256;
+const EthereumTx = require('ethereumjs-tx');
 
-const hdkey = require('ethereumjs-wallet/hdkey')
-const Wallet = require('ethereumjs-wallet')
-const EthereumTx = require('ethereumjs-tx')
+
+// Add functions here
 
 // Generate a random mnemonic (uses crypto.randomBytes under the hood), defaults to 128-bits of entropy
 function generateMnemonic(){
-    return BIP39.generateMnemonic()
+    return BIP39.generateMnemonic();
 }
 
-function generateHexSeed(mnemonic){
-    return BIP39.mnemonicToSeedHex(mnemonic)
+function generateSeed(mnemonic){
+    return BIP39.mnemonicToSeed(mnemonic);
 }
 
-function generatePrivKey(mnemonic){
-    const seed = generateHexSeed(mnemonic)
-    return hdkey.fromMasterSeed(seed).derivePath(`m/44'/60'/0'/0`).getWallet().getPrivateKey()
+function generatePrivKey(mnemonic) {
+    const seed = generateSeed(mnemonic)
+    return hdkey.fromMasterSeed(seed).derivePath(`m/44'/60'/0'/0/0`).getWallet().getPrivateKey()
 }
 
-function derivePubKey(privKey){
+function derivePubKey(privKey) {
     const wallet = Wallet.fromPrivateKey(privKey)    
     return wallet.getPublicKey()
 }
 
-function deriveEthAddress(pubKey){
+function deriveEthAddress(pubKey) {
     const address = keccak256(pubKey) // keccak256 hash of  publicKey
     // Get the last 20 bytes of the public key
-    return "0x" + address.substring(address.length - 40, address.length)
+    return "0x" + address.substring(address.length - 40, address.length)    
 }
 
-function signTx(privKey, txData){
+function signTx(privKey, txData) {
     const tx = new EthereumTx(txData)
     tx.sign(privKey)
     return tx
 }
 
-function getSignerAddress(signedTx){
+function getSignerAddress(signedTx) {
     return "0x" + signedTx.getSenderAddress().toString('hex')
 }
 
@@ -92,6 +94,7 @@ var mnemonicVue = new Vue({
         }
     }
 })
+
 },{"bip39":22,"ethereumjs-tx":104,"ethereumjs-wallet":107,"ethereumjs-wallet/hdkey":106,"js-sha3":131}],2:[function(require,module,exports){
 var asn1 = exports;
 
@@ -32737,7 +32740,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.1",
-      "/home/josh/Documents/ethereum-address-generator-js"
+      "/Users/pjimenez/code/ethereum/dev-bootcamp-2019/dev-bootcamp-2019/ethereum-address-generator-js"
     ]
   ],
   "_from": "elliptic@6.4.1",
@@ -32758,11 +32761,12 @@ module.exports={
   },
   "_requiredBy": [
     "/browserify-sign",
-    "/create-ecdh"
+    "/create-ecdh",
+    "/secp256k1"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.1.tgz",
   "_spec": "6.4.1",
-  "_where": "/home/josh/Documents/ethereum-address-generator-js",
+  "_where": "/Users/pjimenez/code/ethereum/dev-bootcamp-2019/dev-bootcamp-2019/ethereum-address-generator-js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
